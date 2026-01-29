@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Reference repos (cloned for development)
+preact-source/
+preact-test-demo/
+preact-devtools-ref/
+preact-reference/
+
+# Environment
+.env
+.env.local
+
+# Lock files (optional - uncomment if you prefer not to commit)
+# package-lock.json
