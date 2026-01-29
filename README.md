@@ -22,7 +22,7 @@ Preact is excellent, but its codebase is heavily optimized and can be difficult 
 - Keyed list reconciliation
 - Event delegation
 - SVG namespace support
-- Hot Module Replacement (HMR) / Fast Refresh
+- Hot Module Replacement (HMR) / Fast Refresh with custom vite plugin
 - Preact DevTools support
 - Comprehensive test suite
 - See [Compatibility](#compatibility) for what it's missing
@@ -218,7 +218,7 @@ import 'worse-preact/src/devtools.js';
 
 ### HMR / Fast Refresh
 
-Import the HMR runtime and use the Vite plugin:
+Import the HMR runtime and use the included Vite plugin:
 
 ```js
 // main.js
@@ -235,6 +235,8 @@ export default defineConfig({
   // ...
 });
 ```
+
+> **Note:** The official `@preact/preset-vite` does not work with this library. Use the included `vite-plugin-hmr.js` instead.
 
 ## API Reference
 
@@ -292,7 +294,7 @@ tests/
 npm run dev
 ```
 
-Open http://localhost:3004 in your browser.
+Open http://localhost:3003 in your browser.
 
 ## Running Tests
 
