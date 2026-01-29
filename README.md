@@ -1,6 +1,6 @@
 # Worse Preact
 
-A minimal, readable Preact-compatible virtual DOM library. Built as a drop-in replacement for Preact, prioritizing **code clarity** over micro-optimizations.
+A minimal, readable Preact-compatible virtual DOM library. Built as a drop-in replacement for Preact, prioritizing **code clarity** and **simplicity** over micro-optimizations.
 
 ## Why?
 
@@ -13,7 +13,7 @@ This library was designed for environments where security and auditability matte
 - **Compliance requirements** - Can easily be used without node_modules, no supply chain risk
 - **Embedded systems** - Works in any ES6+ JavaScript environment
 
-Preact is excellent, but its codebase is heavily optimized and can be difficult to understand for developers unfamiliar with virtual DOM internals. This project provides the same API with code that's easy to read, audit, and learn from.
+Preact is excellent, but its codebase is heavily optimized and can be difficult to understand for developers unfamiliar with virtual DOM internals. It is also in TypeScript and has complex build steps whereas this project has none. This project provides the same API with code that's easy to read, audit, and learn from. You can easily swap this out for Preact or React later on if desired.
 
 ## Features
 
@@ -25,6 +25,7 @@ Preact is excellent, but its codebase is heavily optimized and can be difficult 
 - Hot Module Replacement (HMR) / Fast Refresh
 - Preact DevTools support
 - Comprehensive test suite
+- See [Compatibility](#compatibility) for what it's missing
 
 ## Installation
 
@@ -355,21 +356,21 @@ component.__hooks = {
 
 This library implements the core APIs needed for most applications:
 
-| Feature                             | Status      |
-| ----------------------------------- | ----------- |
-| Function components                 | Supported   |
-| All hooks (useState, useEffect, etc.) | Supported |
-| Fragments                           | Supported   |
-| Refs (object and callback)          | Supported   |
-| Keys                                | Supported   |
-| SVG                                 | Supported   |
-| `Component` class                   | Not included (use function components) |
-| `createContext`                     | Not included (useContext works with plain objects) |
-| `forwardRef`                        | Not included |
-| `memo`                              | Not included |
-| `lazy` / `Suspense`                 | Not included |
-| `cloneElement`                      | Not included |
-| `createPortal`                      | Not included |
+| Feature                               | Status                                             |
+| ------------------------------------- | -------------------------------------------------- |
+| Function components                   | Supported                                          |
+| All hooks (useState, useEffect, etc.) | Supported                                          |
+| Fragments                             | Supported                                          |
+| Refs (object and callback)            | Supported                                          |
+| Keys                                  | Supported                                          |
+| SVG                                   | Supported                                          |
+| `Component` class                     | Not included (use function components)             |
+| `createContext`                       | Not included (useContext works with plain objects) |
+| `forwardRef`                          | Not included                                       |
+| `memo`                                | Not included                                       |
+| `lazy` / `Suspense`                   | Not included                                       |
+| `cloneElement`                        | Not included                                       |
+| `createPortal`                        | Not included                                       |
 
 For most applications using modern function components and hooks, this library is a drop-in replacement. Code prioritizes readability over bundle size.
 
