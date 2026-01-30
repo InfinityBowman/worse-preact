@@ -5,10 +5,11 @@ export default defineConfig({
   plugins: [
     customPreactHmr(),
   ],
+  root: 'demo-jsx',
   esbuild: {
     jsxFactory: 'h',
     jsxFragment: 'Fragment',
-    jsxInject: `import { h, Fragment } from '/src/index.js'`
+    jsxInject: `import { h, Fragment } from '../src/index.js'`
   },
   server: {
     port: 3003

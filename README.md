@@ -280,21 +280,16 @@ src/
   devtools.js    # Preact DevTools integration
   hmr.js         # Hot Module Replacement runtime
 
-demo/
+demo-htm/
+  main.js       # Demo app entry point
+  components/    # Example components
+demo-jsx/
   main.jsx       # Demo app entry point
   components/    # Example components
 
 tests/
   *.test.js      # Jest test suite
 ```
-
-## Running the Demo
-
-```bash
-npm run dev
-```
-
-Open http://localhost:3003 in your browser.
 
 ## Running Tests
 

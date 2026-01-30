@@ -12,7 +12,8 @@
     "./hmr": "./src/hmr.js"
   },
   "scripts": {
-    "dev": "vite",
+    "dev:jsx": "vite --config vite.config.jsx.js",
+    "dev:htm": "vite --config vite.config.htm.js",
     "build": "vite build",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --no-watchman",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --no-watchman"
