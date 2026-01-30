@@ -5,9 +5,6 @@
  * Vite transforms JSX into h() calls using our library.
  */
 
-// Import HMR runtime first (sets up hooks before any components load)
-import 'worse-preact/hmr';
-
 // Import DevTools integration (connects to Preact DevTools extension)
 import 'worse-preact/devtools';
 

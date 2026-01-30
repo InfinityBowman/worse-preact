@@ -5,9 +5,6 @@
  * HTM lets you write JSX-like syntax using tagged template literals - no build step required!
  */
 
-// Import HMR runtime first (sets up hooks before any components load)
-import 'worse-preact/hmr';
-
 // Import DevTools integration (connects to Preact DevTools extension)
 import 'worse-preact/devtools';
 
