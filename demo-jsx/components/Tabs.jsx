@@ -4,7 +4,7 @@
  * Demonstrates: Conditional rendering, component composition, Fragments
  */
 
-import { useState } from '../../src/index.js';
+import { useState } from 'worse-preact';
 
 // Individual tab content components
 function HomeTab() {

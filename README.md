@@ -218,25 +218,28 @@ import 'worse-preact/src/devtools.js';
 
 ### HMR / Fast Refresh
 
-Import the HMR runtime and use the included Vite plugin:
-
-```js
-// main.js
-import 'worse-preact/src/hmr.js';
-```
+Use the included Vite plugin for Hot Module Replacement with state preservation:
 
 ```js
 // vite.config.js
 import { defineConfig } from 'vite';
-import worsePreactHMR from './vite-plugin-hmr.js';
+import worsePreactHmr from 'worse-preact/vite-plugin';
 
 export default defineConfig({
-  plugins: [worsePreactHMR()],
-  // ...
+  plugins: [worsePreactHmr()],
+  esbuild: {
+    jsxFactory: 'h',
+    jsxFragment: 'Fragment',
+    jsxInject: `import { h, Fragment } from 'worse-preact'`,
+  },
 });
 ```
 
-> **Note:** The official `@preact/preset-vite` does not work with this library. Use the included `vite-plugin-hmr.js` instead.
+The plugin uses Babel to detect components and track hook signatures. When you edit a component:
+- **Code/JSX changes only**: State is preserved
+- **Hook changes** (add/remove/reorder): State is automatically reset
+
+> **Note:** The official `@preact/preset-vite` does not work with this library. Use the included Vite plugin instead.
 
 ## API Reference
 
@@ -268,27 +271,51 @@ export default defineConfig({
 
 ```
 src/
-  index.js       # Public API exports
-  vnode.js       # h(), createElement, Fragment, createRef
-  render.js      # render() entry point
-  diff.js        # Core diffing algorithm
-  children.js    # Child reconciliation with key support
-  props.js       # DOM property handling, event delegation
-  hooks.js       # All React-style hooks
-  scheduler.js   # Batched re-render scheduling
-  options.js     # Hook points for plugins
-  devtools.js    # Preact DevTools integration
-  hmr.js         # Hot Module Replacement runtime
+  index.js         # Public API exports
+  vnode.js         # h(), createElement, Fragment, createRef
+  render.js        # render() entry point
+  diff.js          # Core diffing algorithm
+  children.js      # Child reconciliation with key support
+  props.js         # DOM property handling, event delegation
+  hooks.js         # All React-style hooks
+  scheduler.js     # Batched re-render scheduling
+  options.js       # Hook points for plugins
+  devtools.js      # Preact DevTools integration
+  hmr-runtime.js   # Hot Module Replacement runtime
+  hmr-constants.js # HMR internal constants
 
-demo-htm/
-  main.js       # Demo app entry point
-  components/    # Example components
-demo-jsx/
-  main.jsx       # Demo app entry point
-  components/    # Example components
+vite-plugin-hmr.js # Vite plugin for HMR/Fast Refresh
+
+demo-jsx/          # JSX demo (standalone package)
+  package.json     # Has worse-preact as dependency
+  vite.config.js   # Uses worse-preact/vite-plugin
+  main.jsx         # Demo entry point
+  components/      # Example components
+
+demo-htm/          # HTM demo (standalone package)
+  package.json     # Has worse-preact + htm as dependencies
+  vite.config.js   # Uses worse-preact/vite-plugin
+  main.js          # Demo entry point
+  components/      # Example components
 
 tests/
-  *.test.js      # Jest test suite
+  *.test.js        # Jest test suite
+```
+
+## Running the Demos
+
+Each demo is a standalone package that shows how to use worse-preact:
+
+```bash
+# JSX Demo
+cd demo-jsx
+npm install
+npm run dev
+
+# HTM Demo
+cd demo-htm
+npm install
+npm run dev
 ```
 
 ## Running Tests

@@ -4,7 +4,7 @@
  * Demonstrates: useEffect with cleanup
  */
 
-import { useState, useEffect } from '../../src/index.js';
+import { useState, useEffect } from 'worse-preact';
 import { html } from '../html.js';
 
 export function Timer() {

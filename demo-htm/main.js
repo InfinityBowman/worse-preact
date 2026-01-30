@@ -6,12 +6,12 @@
  */
 
 // Import HMR runtime first (sets up hooks before any components load)
-import '../src/hmr.js';
+import 'worse-preact/hmr';
 
 // Import DevTools integration (connects to Preact DevTools extension)
-import '../src/devtools.js';
+import 'worse-preact/devtools';
 
-import { render } from '../src/index.js';
+import { render } from 'worse-preact';
 import { html } from './html.js';
 
 // Import all demo components

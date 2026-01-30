@@ -2,66 +2,26 @@
  * Vite Plugin for Worse Preact HMR
  *
  * This plugin enables Fast Refresh by:
- * 1. Detecting exported components in JSX/JS files
+ * 1. Using Babel to detect components and hook signatures
  * 2. Injecting registration code for each component
- * 3. Setting up HMR accept handlers
+ * 3. Setting up HMR accept handlers with signature comparison
+ *
+ * In production builds, this plugin does nothing - no HMR code is included.
  */
 
-/**
- * Detects if a name looks like a component (PascalCase)
- */
-function isComponentName(name) {
-  return /^[A-Z][a-zA-Z0-9]*$/.test(name);
-}
+import { transformSync } from '@babel/core';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-/**
- * Extract exported function/const components from code
- * Returns array of { name, isDefault }
- */
-function findExportedComponents(code) {
-  const components = [];
-
-  // Match: export function ComponentName
-  const exportFuncRegex = /export\s+function\s+([A-Z][a-zA-Z0-9]*)\s*\(/g;
-  let match;
-  while ((match = exportFuncRegex.exec(code)) !== null) {
-    components.push({ name: match[1], isDefault: false });
-  }
-
-  // Match: export const ComponentName =
-  const exportConstRegex = /export\s+const\s+([A-Z][a-zA-Z0-9]*)\s*=/g;
-  while ((match = exportConstRegex.exec(code)) !== null) {
-    components.push({ name: match[1], isDefault: false });
-  }
-
-  // Match: export default function ComponentName
-  const exportDefaultFuncRegex = /export\s+default\s+function\s+([A-Z][a-zA-Z0-9]*)\s*\(/g;
-  while ((match = exportDefaultFuncRegex.exec(code)) !== null) {
-    components.push({ name: match[1], isDefault: true });
-  }
-
-  // Match: function ComponentName ... export default ComponentName
-  const funcRegex = /function\s+([A-Z][a-zA-Z0-9]*)\s*\(/g;
-  const defaultExportRegex = /export\s+default\s+([A-Z][a-zA-Z0-9]*)\s*[;\n]/g;
-  const funcNames = new Set();
-  while ((match = funcRegex.exec(code)) !== null) {
-    funcNames.add(match[1]);
-  }
-  while ((match = defaultExportRegex.exec(code)) !== null) {
-    if (funcNames.has(match[1]) && !components.find(c => c.name === match[1])) {
-      components.push({ name: match[1], isDefault: true });
-    }
-  }
-
-  return components;
-}
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
  * @returns {import('vite').Plugin}
  */
-export default function worsePreactHmr() {
+export default function worsePreactHmr(options = {}) {
   let isProduction = false;
   let hmrDisabled = false;
+  let hmrRuntimePath = '';
 
   return {
     name: 'worse-preact-hmr',
@@ -69,44 +29,110 @@ export default function worsePreactHmr() {
     configResolved(config) {
       isProduction = config.isProduction || config.command === 'build';
       hmrDisabled = config.server?.hmr === false;
+      // Resolve path to HMR runtime
+      hmrRuntimePath = resolve(__dirname, 'src/hmr-runtime.js');
     },
 
     transform(code, id) {
       // Skip in production or if HMR is disabled
       if (isProduction || hmrDisabled) return null;
 
-      // Only process JSX/TSX/JS files, not node_modules
-      if (!/\.[jt]sx?$/.test(id) || id.includes('node_modules')) {
+      // Only process JSX/TSX/JS/TS files, not node_modules
+      if (!/\.(c|m)?(t|j)sx?$/.test(id) || id.includes('node_modules')) {
         return null;
       }
 
-      // Find exported components
-      const components = findExportedComponents(code);
+      // Skip library source files to avoid circular imports
+      if (id.includes('/src/') && id.includes('worse-preact')) {
+        return null;
+      }
+
+      // Configure parser plugins based on file extension
+      const parserPlugins = [
+        'jsx',
+        'classProperties',
+        'classPrivateProperties',
+        'classPrivateMethods',
+        /\.tsx?$/.test(id) && 'typescript',
+        ...((options && options.parserPlugins) || []),
+      ].filter(Boolean);
+
+      // Transform with Babel using prefresh plugin
+      let result;
+      try {
+        result = transformSync(code, {
+          plugins: [['@prefresh/babel-plugin', { skipEnvCheck: true }]],
+          parserOpts: {
+            plugins: parserPlugins,
+          },
+          ast: false,
+          sourceMaps: true,
+          filename: id,
+          sourceFileName: id,
+          configFile: false,
+          babelrc: false,
+        });
+      } catch (err) {
+        // If Babel fails, return original code
+        console.warn(`[worse-preact-hmr] Babel transform failed for ${id}:`, err.message);
+        return null;
+      }
+
+      if (!result || !result.code) return null;
+
+      // Check if Babel generated refresh code
+      const hasReg = /\$RefreshReg\$\(/.test(result.code);
+      const hasSig = /\$RefreshSig\$\(/.test(result.code);
 
       // Skip if no components found
-      if (components.length === 0) return null;
+      if (!hasReg && !hasSig) return null;
 
-      // Generate registration code
-      const registrations = components
-        .map((c) => `self.__WORSE_PREACT_HMR__?.register(${c.name}, ${JSON.stringify(id + ':' + c.name)});`)
-        .join('\n');
+      // Inject HMR runtime setup
+      const prelude = `
+import ${JSON.stringify(hmrRuntimePath)};
 
-      // Generate HMR accept handler
-      const hmrCode = `
+let prevRefreshReg;
+let prevRefreshSig;
+
 if (import.meta.hot) {
-  // Register components
-  ${registrations}
+  prevRefreshReg = self.$RefreshReg$ || (() => {});
+  prevRefreshSig = self.$RefreshSig$ || (() => (type) => type);
 
-  // Accept updates and flush
+  self.$RefreshReg$ = (type, id) => {
+    self.__WORSE_PREACT_HMR__.register(type, ${JSON.stringify(id)} + " " + id);
+  };
+
+  self.$RefreshSig$ = () => {
+    let status = 'begin';
+    let savedType;
+    return (type, key, forceReset, getCustomHooks) => {
+      if (!savedType) savedType = type;
+      status = self.__WORSE_PREACT_HMR__.sign(type || savedType, key, forceReset, getCustomHooks, status);
+      return type;
+    };
+  };
+}
+`;
+
+      // Add HMR accept handler
+      const outro = `
+if (import.meta.hot) {
+  self.$RefreshReg$ = prevRefreshReg;
+  self.$RefreshSig$ = prevRefreshSig;
   import.meta.hot.accept(() => {
-    self.__WORSE_PREACT_HMR__?.flush();
+    try {
+      self.__WORSE_PREACT_HMR__.flush();
+    } catch (e) {
+      console.error('[worse-preact-hmr] Failed to flush updates:', e);
+      self.location.reload();
+    }
   });
 }
 `;
 
       return {
-        code: code + '\n' + hmrCode,
-        map: null, // TODO: proper source maps
+        code: prelude + result.code + outro,
+        map: result.map,
       };
     },
   };

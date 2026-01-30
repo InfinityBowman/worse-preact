@@ -4,7 +4,7 @@
  * Demonstrates: Dynamic SVG rendering
  */
 
-import { useState } from '../../src/index.js';
+import { useState } from 'worse-preact';
 import { html } from '../html.js';
 
 export function SVGDemo() {

@@ -4,7 +4,7 @@
  * Demonstrates: useMemo and useCallback
  */
 
-import { useState, useMemo, useCallback } from '../../src/index.js';
+import { useState, useMemo, useCallback } from 'worse-preact';
 import { html } from '../html.js';
 
 function ExpensiveCalculation({ value }) {

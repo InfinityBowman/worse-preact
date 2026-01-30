@@ -5,7 +5,8 @@ This demo showcases Worse Preact with [HTM](https://github.com/developit/htm) (H
 ## Running the Demo
 
 ```bash
-npm run dev:htm
+npm install
+npm run dev
 ```
 
 Then open http://localhost:3004
@@ -39,8 +40,8 @@ HTM provides JSX-like syntax without requiring a build step or transpiler:
 HTM uses tagged template literals to create virtual DOM nodes:
 
 ```javascript
-import { h, useState } from '../src/index.js';
-import htm from 'https://esm.sh/htm@3.1.1';
+import { h, useState } from 'worse-preact';
+import htm from 'htm';
 
 // Bind HTM to our h function
 const html = htm.bind(h);

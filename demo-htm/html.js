@@ -5,8 +5,8 @@
  * Import this in components to use HTM syntax.
  */
 
-import { h } from '../src/index.js';
-import htm from 'https://esm.sh/htm@3.1.1';
+import { h } from 'worse-preact';
+import htm from 'htm';
 
 // Bind HTM to our h function
 export const html = htm.bind(h);

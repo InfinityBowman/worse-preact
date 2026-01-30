@@ -4,7 +4,7 @@
  * Demonstrates: Conditional rendering, complex state
  */
 
-import { useState } from '../../src/index.js';
+import { useState } from 'worse-preact';
 import { html } from '../html.js';
 
 const tabData = [

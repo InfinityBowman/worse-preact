@@ -4,7 +4,7 @@
  * Demonstrates: useState hook with HTM syntax
  */
 
-import { useState } from '../../src/index.js';
+import { useState } from 'worse-preact';
 import { html } from '../html.js';
 
 export function Counter() {

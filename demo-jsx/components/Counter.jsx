@@ -4,7 +4,7 @@
  * Demonstrates: useState hook
  */
 
-import { useState } from '../../src/index.js';
+import { useState } from 'worse-preact';
 
 export function Counter() {
   const [count, setCount] = useState(0);

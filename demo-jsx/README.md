@@ -5,7 +5,8 @@ This demo showcases Worse Preact with JSX syntax, using Vite for development.
 ## Running the Demo
 
 ```bash
-npm run dev:jsx
+npm install
+npm run dev
 ```
 
 Then open http://localhost:3003
@@ -41,7 +42,7 @@ h('button', { onClick: () => setCount(c => c + 1) },
 )
 ```
 
-The config in `vite.config.jsx.js` sets up:
+The config in `vite.config.js` sets up:
 - `jsxFactory: 'h'` - Use our `h` function for elements
 - `jsxFragment: 'Fragment'` - Use our `Fragment` for `<>...</>`
 - `jsxInject` - Auto-import `h` and `Fragment` in every file

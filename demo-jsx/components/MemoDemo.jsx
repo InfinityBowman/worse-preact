@@ -4,11 +4,11 @@
  * Demonstrates: useMemo for expensive computations
  */
 
-import { useState, useMemo } from '../../src/index.js';
+import { useState, useMemo } from 'worse-preact';
 
 // Simulated expensive computation
 function expensiveCalculation(n) {
-  console.log(`🔢 Computing primes up to ${n}...`);
+  console.log(`Computing primes up to ${n}...`);
   const primes = [];
   for (let num = 2; num <= n; num++) {
     let isPrime = true;
