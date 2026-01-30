@@ -13,6 +13,7 @@
     "./vite-plugin": "./vite-plugin-hmr.js"
   },
   "scripts": {
+    "build": "vite build",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --no-watchman",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --no-watchman"
   },
