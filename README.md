@@ -394,7 +394,7 @@ This library implements the core APIs needed for most applications:
 | `memo`                                | Not included                                       |
 | `lazy` / `Suspense`                   | Not included                                       |
 | `cloneElement`                        | Not included                                       |
-| `createPortal`                        | Not included                                       |
+| `createPortal`                        | Supported                                          |
 
 For most applications using modern function components and hooks, this library is a drop-in replacement. Code prioritizes readability over bundle size.
 

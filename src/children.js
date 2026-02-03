@@ -12,6 +12,7 @@
  */
 
 import { createVNode, INSERT_VNODE, MATCHED, Fragment } from './vnode.js';
+import { PORTAL_TYPE } from './portal.js';
 
 /**
  * Diffs children of a parent element
@@ -203,6 +204,11 @@ export function diffChildren(
  * Places all DOM nodes of a vnode at the correct position
  */
 function placeChild(parentDom, vnode, refDom) {
+  // Skip portals - their children are in a different container
+  if (vnode.type === PORTAL_TYPE) {
+    return;
+  }
+
   if (vnode._dom) {
     // Single DOM node
     if (vnode._dom.parentNode === parentDom) {
@@ -281,6 +287,11 @@ function normalizeChildren(children, normalized, parentVNode) {
 function getFirstDom(vnode) {
   if (!vnode) return null;
 
+  // Skip portals - their children are in a different container
+  if (vnode.type === PORTAL_TYPE) {
+    return null;
+  }
+
   // If this vnode has a direct DOM node, return it
   if (vnode._dom) {
     return vnode._dom;
@@ -308,6 +319,11 @@ function getFirstDom(vnode) {
  */
 function getLastDom(vnode) {
   if (!vnode) return null;
+
+  // Skip portals - their children are in a different container
+  if (vnode.type === PORTAL_TYPE) {
+    return null;
+  }
 
   // If this vnode has a direct DOM node, return it
   if (vnode._dom) {

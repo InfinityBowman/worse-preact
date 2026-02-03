@@ -21,6 +21,7 @@ import { ReducerDemo } from './components/ReducerDemo.jsx';
 import { SVGDemo } from './components/SVGDemo.jsx';
 import { FormDemo } from './components/FormDemo.jsx';
 import { ThemeDemo } from './components/ThemeDemo.jsx';
+import { ModalDemo } from './components/ModalDemo.jsx';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
       <SVGDemo />
       <FormDemo />
       <ThemeDemo />
+      <ModalDemo />
     </div>
   );
 }

@@ -10,6 +10,7 @@
  */
 
 import { Fragment } from './vnode.js';
+import { PORTAL_TYPE } from './portal.js';
 import { diffProps } from './props.js';
 import { diffChildren } from './children.js';
 import {
@@ -71,6 +72,20 @@ export function diff(
   // Function components (including Fragments)
   if (typeof newType === 'function') {
     diffComponent(
+      parentDom,
+      newVNode,
+      oldVNode,
+      namespace,
+      commitQueue,
+      oldDom,
+      refQueue
+    );
+    return;
+  }
+
+  // Portal nodes (render children into different container)
+  if (newType === PORTAL_TYPE) {
+    diffPortal(
       parentDom,
       newVNode,
       oldVNode,
@@ -340,6 +355,99 @@ function diffElementNode(
 }
 
 /**
+ * Diffs a portal node
+ *
+ * Portals render their children into a different container than their parent.
+ * This function handles rendering into the target container while maintaining
+ * the vnode tree structure for proper cleanup and reconciliation.
+ *
+ * @param {Element} parentDom - Parent DOM (not used for portal children)
+ * @param {Object} newVNode - New portal vnode
+ * @param {Object|null} oldVNode - Old portal vnode
+ * @param {string|null} namespace - SVG namespace
+ * @param {Array} commitQueue - Components with pending effects
+ * @param {Element|null} oldDom - Existing DOM reference
+ * @param {Array} refQueue - Queue of refs
+ */
+function diffPortal(
+  parentDom,
+  newVNode,
+  oldVNode,
+  namespace,
+  commitQueue,
+  oldDom,
+  refQueue
+) {
+  const newProps = newVNode.props || {};
+  const oldProps = (oldVNode && oldVNode.props) || {};
+
+  const newContainer = newProps._container;
+  const oldContainer = oldProps._container;
+
+  // Validate container
+  if (!newContainer || !(newContainer instanceof Element)) {
+    console.error('createPortal: container must be a DOM element');
+    return;
+  }
+
+  // Check if container changed
+  const containerChanged = oldVNode && oldVNode.type === PORTAL_TYPE && oldContainer !== newContainer;
+
+  // If container changed, unmount from old container
+  if (containerChanged && oldVNode._children) {
+    for (let i = 0; i < oldVNode._children.length; i++) {
+      if (oldVNode._children[i]) {
+        unmount(oldVNode._children[i], oldVNode._children[i], false);
+      }
+    }
+  }
+
+  // Normalize children
+  const newChildren = newProps.children;
+  const childArray = newChildren == null
+    ? []
+    : Array.isArray(newChildren)
+    ? newChildren
+    : [newChildren];
+
+  // Detect namespace from target container
+  const portalNamespace = newContainer.namespaceURI === SVG_NAMESPACE
+    ? SVG_NAMESPACE
+    : null;
+
+  // Diff children into the portal container
+  diffChildren(
+    newContainer, // Render into portal container, not parent
+    childArray,
+    newVNode,
+    containerChanged ? {} : (oldVNode || {}), // Reset if container changed
+    portalNamespace,
+    commitQueue,
+    containerChanged ? newContainer.firstChild : (oldVNode ? null : newContainer.firstChild),
+    refQueue,
+    diff,
+    unmount
+  );
+
+  // Portal itself has no DOM node (children render elsewhere)
+  newVNode._dom = null;
+
+  // Handle ref on portal vnode (ref receives the container)
+  if (newVNode.ref) {
+    refQueue.push({
+      ref: newVNode.ref,
+      value: newContainer,
+      oldRef: oldVNode ? oldVNode.ref : null,
+    });
+  }
+
+  // Call diffed hook
+  if (options.diffed) {
+    options.diffed(newVNode);
+  }
+}
+
+/**
  * Unmounts a vnode, cleaning up DOM and running effect cleanups
  *
  * @param {Object} vnode - VNode to unmount
@@ -372,7 +480,9 @@ export function unmount(vnode, ancestorVNode, skipRemove) {
   // Recursively unmount children
   // If this vnode has a DOM node that was removed, skip removing children's DOM
   // Otherwise (for components/fragments), children need to remove their own DOM
-  const skipChildRemove = skipRemove || !!vnode._dom;
+  // Special case: Portal children are in a different container, so always remove them
+  const isPortal = vnode.type === PORTAL_TYPE;
+  const skipChildRemove = isPortal ? false : (skipRemove || !!vnode._dom);
 
   if (vnode._children) {
     for (let i = 0; i < vnode._children.length; i++) {

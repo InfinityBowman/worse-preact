@@ -17,6 +17,9 @@ export { h, createElement, Fragment, createRef, createVNode } from './vnode.js';
 // Rendering
 export { render, hydrate } from './render.js';
 
+// Portal
+export { createPortal } from './portal.js';
+
 // Options (for plugins like HMR and DevTools)
 export { options } from './options.js';
 
@@ -35,6 +38,7 @@ export {
 // For compatibility with Preact's named imports pattern
 import { h, createElement, Fragment, createRef } from './vnode.js';
 import { render, hydrate } from './render.js';
+import { createPortal } from './portal.js';
 import {
   useState,
   useReducer,
@@ -52,6 +56,7 @@ export default {
   createElement,
   Fragment,
   createRef,
+  createPortal,
   render,
   hydrate,
   useState,
