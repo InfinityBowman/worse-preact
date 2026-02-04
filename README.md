@@ -236,6 +236,7 @@ export default defineConfig({
 ```
 
 The plugin uses Babel to detect components and track hook signatures. When you edit a component:
+
 - **Code/JSX changes only**: State is preserved
 - **Hook changes** (add/remove/reorder): State is automatically reset
 
@@ -380,21 +381,21 @@ component.__hooks = {
 
 This library implements the core APIs needed for most applications:
 
-| Feature                               | Status                                             |
-| ------------------------------------- | -------------------------------------------------- |
-| Function components                   | Supported                                          |
-| All hooks (useState, useEffect, etc.) | Supported                                          |
-| Fragments                             | Supported                                          |
-| Refs (object and callback)            | Supported                                          |
-| Keys                                  | Supported                                          |
-| SVG                                   | Supported                                          |
-| `Component` class                     | Not included (use function components)             |
-| `createContext`                       | Supported                                          |
-| `forwardRef`                          | Not included                                       |
-| `memo`                                | Not included                                       |
-| `lazy` / `Suspense`                   | Not included                                       |
-| `cloneElement`                        | Not included                                       |
-| `createPortal`                        | Supported                                          |
+| Feature                               | Status                                 |
+| ------------------------------------- | -------------------------------------- |
+| Function components                   | Supported                              |
+| All hooks (useState, useEffect, etc.) | Supported                              |
+| Fragments                             | Supported                              |
+| Refs (object and callback)            | Supported                              |
+| Keys                                  | Supported                              |
+| SVG                                   | Supported                              |
+| `Component` class                     | Not included (use function components) |
+| `createContext`                       | Supported                              |
+| `forwardRef`                          | Not included                           |
+| `memo`                                | Not included                           |
+| `lazy` / `Suspense`                   | Not included                           |
+| `cloneElement`                        | Not included                           |
+| `createPortal`                        | Supported                              |
 
 For most applications using modern function components and hooks, this library is a drop-in replacement. Code prioritizes readability over bundle size.
 

@@ -28,9 +28,7 @@ function App() {
   return (
     <div>
       <h1>Worse Preact + JSX</h1>
-      <p className="subtitle">
-        A minimal, readable Preact-compatible library with full JSX support
-      </p>
+      <p className="subtitle">A minimal, readable Preact-compatible library with full JSX support</p>
 
       <Counter />
       <Timer />
