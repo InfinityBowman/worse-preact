@@ -10,6 +10,11 @@
  */
 
 import { enqueueRender } from './scheduler.js';
+import {
+  findProvider,
+  subscribeToProvider,
+  cleanupContextSubscriptions,
+} from './context.js';
 
 /**
  * The component currently being rendered
@@ -258,18 +263,46 @@ export function useCallback(callback, deps) {
 }
 
 /**
- * useContext - Reads a context value
+ * useContext - Reads a context value from the nearest Provider
  *
- * Note: This is a simplified implementation. Full context support
- * would require createContext and Provider components.
+ * Traverses up the component tree to find the nearest Provider for this context.
+ * Subscribes the component to the Provider so it re-renders when value changes.
  *
- * @param {Object} context - Context object with _currentValue
- * @returns {*} The current context value
+ * @param {Object} context - Context object from createContext()
+ * @returns {*} Current context value or default value
+ *
+ * @example
+ * const ThemeContext = createContext('light');
+ *
+ * function Button() {
+ *   const theme = useContext(ThemeContext);
+ *   return h('button', { className: theme }, 'Click me');
+ * }
  */
 export function useContext(context) {
-  // Simple implementation - just read the current value
-  // Full implementation would subscribe to context changes
-  return context._currentValue;
+  const component = currentComponent;
+  if (!component) {
+    throw new Error('useContext must be called during render');
+  }
+
+  const vnode = component._vnode;
+  if (!vnode) {
+    return context._defaultValue;
+  }
+
+  // Find nearest provider in tree (start from parent)
+  const providerVNode = findProvider(context, vnode._parent);
+
+  if (providerVNode) {
+    // Subscribe component to provider for updates
+    subscribeToProvider(providerVNode, component);
+
+    // Return provider's current value
+    return providerVNode._contextValue;
+  }
+
+  // No provider found - use default value
+  return context._defaultValue;
 }
 
 /**
@@ -376,6 +409,9 @@ export function runCleanups(component) {
       hookState._cleanup = undefined;
     }
   });
+
+  // Cleanup context subscriptions
+  cleanupContextSubscriptions(component);
 }
 
 /**

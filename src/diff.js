@@ -11,6 +11,7 @@
 
 import { Fragment } from './vnode.js';
 import { PORTAL_TYPE } from './portal.js';
+import { CONTEXT_PROVIDER, notifyContextSubscribers } from './context.js';
 import { diffProps } from './props.js';
 import { diffChildren } from './children.js';
 import {
@@ -20,7 +21,7 @@ import {
   runCleanups,
   afterPaint,
 } from './hooks.js';
-import { setDiffFunction, setCommitFunction, setUnmountFunction } from './scheduler.js';
+import { setDiffFunction, setCommitFunction, setUnmountFunction, dequeueRender } from './scheduler.js';
 import { options } from './options.js';
 
 /**
@@ -199,6 +200,30 @@ function diffComponent(
   component._vnode = newVNode;
   newVNode._component = component;
 
+  // Handle context Provider components
+  const isProvider = newType._isContextProvider === CONTEXT_PROVIDER;
+  let valueChanged = false;
+
+  if (isProvider) {
+    const newValue = newVNode.props.value;
+    const oldValue = oldVNode ? oldVNode._contextValue : undefined;
+
+    // Store context value on vnode for useContext lookups
+    newVNode._contextValue = newValue;
+
+    // Preserve subscriptions from old vnode
+    if (oldVNode && oldVNode._contextSubscriptions) {
+      newVNode._contextSubscriptions = oldVNode._contextSubscriptions;
+    }
+
+    // Check if value changed
+    valueChanged = oldVNode && !Object.is(oldValue, newValue);
+  }
+
+  // Remove component from render queue if present
+  // (prevents double-render when component is both a subscriber and a tree child)
+  dequeueRender(component);
+
   // Set current component for hooks
   setCurrentComponent(component);
 
@@ -222,6 +247,12 @@ function diffComponent(
 
   // Get old children for diffing
   const oldChildren = oldVNode ? oldVNode._children : null;
+
+  // If Provider value changed, notify subscribers BEFORE diffing children
+  // This allows the scheduler to deduplicate if subscriber is a child
+  if (valueChanged) {
+    notifyContextSubscribers(newVNode);
+  }
 
   // Diff the rendered children
   diffChildren(

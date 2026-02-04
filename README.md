@@ -389,7 +389,7 @@ This library implements the core APIs needed for most applications:
 | Keys                                  | Supported                                          |
 | SVG                                   | Supported                                          |
 | `Component` class                     | Not included (use function components)             |
-| `createContext`                       | Not included (useContext works with plain objects) |
+| `createContext`                       | Supported                                          |
 | `forwardRef`                          | Not included                                       |
 | `memo`                                | Not included                                       |
 | `lazy` / `Suspense`                   | Not included                                       |

@@ -91,6 +91,21 @@ export function enqueueRender(component) {
 }
 
 /**
+ * Removes a component from the render queue
+ *
+ * Called when a component is rendered via the tree diff (not via scheduler)
+ * to prevent double-rendering.
+ *
+ * @param {Object} component - The component instance to remove
+ */
+export function dequeueRender(component) {
+  const index = renderQueue.indexOf(component);
+  if (index !== -1) {
+    renderQueue.splice(index, 1);
+  }
+}
+
+/**
  * Processes all queued component re-renders
  *
  * Components are sorted by depth (parents before children) to avoid

@@ -22,6 +22,7 @@ import { SVGDemo } from './components/SVGDemo.jsx';
 import { FormDemo } from './components/FormDemo.jsx';
 import { ThemeDemo } from './components/ThemeDemo.jsx';
 import { ModalDemo } from './components/ModalDemo.jsx';
+import { ContextDemo } from './components/ContextDemo.jsx';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
       <SVGDemo />
       <FormDemo />
       <ThemeDemo />
+      <ContextDemo />
       <ModalDemo />
     </div>
   );

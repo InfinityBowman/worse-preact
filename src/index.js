@@ -20,6 +20,9 @@ export { render, hydrate } from './render.js';
 // Portal
 export { createPortal } from './portal.js';
 
+// Context
+export { createContext } from './context.js';
+
 // Options (for plugins like HMR and DevTools)
 export { options } from './options.js';
 
@@ -39,6 +42,7 @@ export {
 import { h, createElement, Fragment, createRef } from './vnode.js';
 import { render, hydrate } from './render.js';
 import { createPortal } from './portal.js';
+import { createContext } from './context.js';
 import {
   useState,
   useReducer,
@@ -57,6 +61,7 @@ export default {
   Fragment,
   createRef,
   createPortal,
+  createContext,
   render,
   hydrate,
   useState,
