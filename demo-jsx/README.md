@@ -13,18 +13,18 @@ Then open http://localhost:3003
 
 ## Features Demonstrated
 
-| Component | Hooks Used | Description |
-|-----------|------------|-------------|
-| Counter | `useState` | Basic state management with increment/decrement |
-| Timer | `useState`, `useEffect` | Side effects with cleanup (interval) |
-| TodoList | `useState`, `useRef` | Array state, refs for DOM access |
-| Tabs | `useState` | Conditional rendering |
-| MouseTracker | `useState`, `useEffect`, `useRef` | Event listeners with cleanup |
-| MemoDemo | `useState`, `useMemo`, `useCallback` | Performance optimization |
-| ReducerDemo | `useReducer` | Complex state transitions |
-| SVGDemo | `useState` | Dynamic SVG rendering |
-| FormDemo | `useState` | Controlled form inputs |
-| ThemeDemo | `useState`, `useMemo`, `useCallback` | Dynamic theming, prop drilling |
+| Component    | Hooks Used                           | Description                                     |
+| ------------ | ------------------------------------ | ----------------------------------------------- |
+| Counter      | `useState`                           | Basic state management with increment/decrement |
+| Timer        | `useState`, `useEffect`              | Side effects with cleanup (interval)            |
+| TodoList     | `useState`, `useRef`                 | Array state, refs for DOM access                |
+| Tabs         | `useState`                           | Conditional rendering                           |
+| MouseTracker | `useState`, `useEffect`, `useRef`    | Event listeners with cleanup                    |
+| MemoDemo     | `useState`, `useMemo`, `useCallback` | Performance optimization                        |
+| ReducerDemo  | `useReducer`                         | Complex state transitions                       |
+| SVGDemo      | `useState`                           | Dynamic SVG rendering                           |
+| FormDemo     | `useState`                           | Controlled form inputs                          |
+| ThemeDemo    | `useState`, `useMemo`, `useCallback` | Dynamic theming, prop drilling                  |
 
 ## How It Works
 
@@ -32,17 +32,14 @@ Vite transforms JSX syntax into `h()` function calls using esbuild:
 
 ```jsx
 // You write:
-<button onClick={() => setCount(c => c + 1)}>
-  Count: {count}
-</button>
+<button onClick={() => setCount((c) => c + 1)}>Count: {count}</button>;
 
 // Becomes:
-h('button', { onClick: () => setCount(c => c + 1) },
-  'Count: ', count
-)
+h('button', { onClick: () => setCount((c) => c + 1) }, 'Count: ', count);
 ```
 
 The config in `vite.config.js` sets up:
+
 - `jsxFactory: 'h'` - Use our `h` function for elements
 - `jsxFragment: 'Fragment'` - Use our `Fragment` for `<>...</>`
 - `jsxInject` - Auto-import `h` and `Fragment` in every file

@@ -22,18 +22,18 @@ HTM provides JSX-like syntax without requiring a build step or transpiler:
 
 ## Features Demonstrated
 
-| Component | Hooks Used | Description |
-|-----------|------------|-------------|
-| Counter | `useState` | Basic state management |
-| Timer | `useState`, `useEffect` | Side effects with cleanup |
-| TodoList | `useState`, `useRef` | Array state, refs |
-| Tabs | `useState` | Conditional rendering |
-| MouseTracker | `useState`, `useEffect`, `useRef` | Event listeners |
-| MemoDemo | `useState`, `useMemo`, `useCallback` | Performance optimization |
-| ReducerDemo | `useReducer` | Complex state transitions |
-| SVGDemo | `useState` | Dynamic SVG rendering |
-| FormDemo | `useState` | Controlled form inputs |
-| ThemeDemo | `useState`, `useMemo`, `useCallback` | Dynamic theming |
+| Component    | Hooks Used                           | Description               |
+| ------------ | ------------------------------------ | ------------------------- |
+| Counter      | `useState`                           | Basic state management    |
+| Timer        | `useState`, `useEffect`              | Side effects with cleanup |
+| TodoList     | `useState`, `useRef`                 | Array state, refs         |
+| Tabs         | `useState`                           | Conditional rendering     |
+| MouseTracker | `useState`, `useEffect`, `useRef`    | Event listeners           |
+| MemoDemo     | `useState`, `useMemo`, `useCallback` | Performance optimization  |
+| ReducerDemo  | `useReducer`                         | Complex state transitions |
+| SVGDemo      | `useState`                           | Dynamic SVG rendering     |
+| FormDemo     | `useState`                           | Controlled form inputs    |
+| ThemeDemo    | `useState`, `useMemo`, `useCallback` | Dynamic theming           |
 
 ## How It Works
 
@@ -49,22 +49,18 @@ const html = htm.bind(h);
 function Counter() {
   const [count, setCount] = useState(0);
 
-  return html`
-    <button onClick=${() => setCount(c => c + 1)}>
-      Count: ${count}
-    </button>
-  `;
+  return html` <button onClick=${() => setCount((c) => c + 1)}>Count: ${count}</button> `;
 }
 ```
 
 ### HTM Syntax Notes
 
-| JSX | HTM |
-|-----|-----|
-| `className="foo"` | `class="foo"` |
-| `{value}` | `${value}` |
-| `onClick={fn}` | `onClick=${fn}` |
-| `<Comp />` | `<${Comp} />` |
+| JSX                     | HTM                     |
+| ----------------------- | ----------------------- |
+| `className="foo"`       | `class="foo"`           |
+| `{value}`               | `${value}`              |
+| `onClick={fn}`          | `onClick=${fn}`         |
+| `<Comp />`              | `<${Comp} />`           |
 | `<Comp>children</Comp>` | `<${Comp}>children<//>` |
 
 ## HMR Support
@@ -96,12 +92,14 @@ demo-htm/
 ## Using HTM in Your Project
 
 1. Import HTM from a CDN or npm:
+
    ```javascript
    import htm from 'https://esm.sh/htm@3.1.1';
    // or: import htm from 'htm';
    ```
 
 2. Bind it to the `h` function:
+
    ```javascript
    import { h } from 'worse-preact';
    const html = htm.bind(h);
