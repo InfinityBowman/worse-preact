@@ -24,6 +24,7 @@ coverage/
 
 # Reference repos (cloned for development)
 tmp/
+reference/
 preact-source/
 preact-test-demo/
 preact-devtools-ref/

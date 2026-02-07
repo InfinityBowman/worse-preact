@@ -36,6 +36,8 @@ export {
   useMemo,
   useCallback,
   useContext,
+  useSyncExternalStore,
+  useDebugValue,
 } from './hooks.js';
 
 // For compatibility with Preact's named imports pattern
@@ -52,6 +54,8 @@ import {
   useMemo,
   useCallback,
   useContext,
+  useSyncExternalStore,
+  useDebugValue,
 } from './hooks.js';
 
 // Default export matching Preact's structure
@@ -72,4 +76,6 @@ export default {
   useMemo,
   useCallback,
   useContext,
+  useSyncExternalStore,
+  useDebugValue,
 };

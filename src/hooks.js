@@ -263,6 +263,46 @@ export function useCallback(callback, deps) {
 }
 
 /**
+ * useSyncExternalStore - Subscribes to an external store
+ *
+ * @param {Function} subscribe - Function (callback) => unsubscribe
+ * @param {Function} getSnapshot - Returns the current store value
+ * @param {Function} [getServerSnapshot] - Unused (SSR), accepted for API compat
+ * @returns {*} The current snapshot value
+ *
+ * @example
+ * const state = useSyncExternalStore(store.subscribe, store.getState);
+ */
+export function useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
+  const [snapshot, setSnapshot] = useState(() => getSnapshot());
+
+  // Re-subscribe whenever subscribe identity changes
+  useEffect(() => {
+    // Check for a missed update between render and subscribe
+    const currentSnapshot = getSnapshot();
+    if (!Object.is(snapshot, currentSnapshot)) {
+      setSnapshot(currentSnapshot);
+    }
+
+    return subscribe(() => {
+      setSnapshot(getSnapshot());
+    });
+  }, [subscribe]);
+
+  return snapshot;
+}
+
+/**
+ * useDebugValue - Display a label in React DevTools
+ *
+ * No-op in worse-preact. Accepted for API compatibility.
+ *
+ * @param {*} _value - Debug value (ignored)
+ * @param {Function} [_formatter] - Optional formatter (ignored)
+ */
+export function useDebugValue(_value, _formatter) {}
+
+/**
  * useContext - Reads a context value from the nearest Provider
  *
  * Traverses up the component tree to find the nearest Provider for this context.

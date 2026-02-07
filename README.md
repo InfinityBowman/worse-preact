@@ -267,6 +267,8 @@ The plugin uses Babel to detect components and track hook signatures. When you e
 | `useMemo(factory, deps)`          | Memoized computed value                  |
 | `useCallback(callback, deps)`     | Memoized callback function               |
 | `useContext(context)`             | Read from a context                      |
+| `useSyncExternalStore(sub, snap)` | Subscribe to an external store           |
+| `useDebugValue(value)`            | No-op (API compatibility)                |
 
 ## Project Structure
 
