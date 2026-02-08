@@ -4,7 +4,7 @@
  * Demonstrates: Conditional rendering, component composition, Fragments
  */
 
-import { useState } from 'worse-preact';
+import { useState } from 'preact/hooks';
 
 // Individual tab content components
 function HomeTab() {

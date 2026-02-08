@@ -1,133 +1,106 @@
-# Worse Preact
+# Preact (Copy-Paste Edition)
 
-A minimal, readable Preact-compatible virtual DOM library. Built as a drop-in replacement for Preact, prioritizing **code clarity** and **simplicity** over micro-optimizations.
+Real Preact source, restructured for easy copy-paste usage. **No build step required.** Just drop it into your project.
 
 ## Why?
 
-**Zero dependencies. No build step required. Just copy and paste.**
+Preact is excellent, but its build system (microbundle, property mangling, multiple output formats) makes it hard to just grab the source and use it directly. This project takes the real, battle-tested Preact source and makes one change: `.js` extensions on all relative imports so it works as native ES modules without a bundler.
 
-This library was designed for environments where security and auditability matter:
+This is useful for:
 
-- **Air-gapped systems** - Copy the `src/` folder directly into your project
-- **Security-sensitive codebases** - Every line is readable and auditable
-- **Compliance requirements** - Can easily be used without node_modules, no supply chain risk
-- **Embedded systems** - Works in any ES6+ JavaScript environment
+- **Air-gapped systems** - Copy the source directly into your project
+- **Security-sensitive codebases** - Auditable source, no supply chain risk
+- **Prototyping** - No setup, just import and go
+- **Learning** - Read the actual Preact source without build artifacts in the way
 
-Preact is excellent, but its codebase is heavily optimized and can be difficult to understand for developers unfamiliar with virtual DOM internals. It is also in TypeScript and has complex build steps whereas this project has none. This project provides the same API with code that's easy to read, audit, and learn from. You can easily swap this out for Preact or React later on if desired.
+This is **real Preact** - not a reimplementation. You get the same proven diffing algorithm, the same hooks, the same compat layer.
 
-## Features
+## What's Included
 
-- Full Preact API compatibility (h, render, Fragment, hooks)
-- Works with [htm](https://github.com/developit/htm) for JSX-like syntax without a build step
-- Keyed list reconciliation
-- Event delegation
-- SVG namespace support
-- Hot Module Replacement (HMR) / Fast Refresh with custom vite plugin
-- Preact DevTools support
-- Comprehensive test suite
-- See [Compatibility](#compatibility) for what it's missing
+| Module      | Import               | Description                                                                                        |
+| ----------- | -------------------- | -------------------------------------------------------------------------------------------------- |
+| Core        | `preact`             | h, render, Component, Fragment, createContext, cloneElement                                        |
+| Hooks       | `preact/hooks`       | useState, useEffect, useReducer, useRef, useMemo, useCallback, useContext, useId, useErrorBoundary |
+| Compat      | `preact/compat`      | React compatibility: memo, forwardRef, Suspense, lazy, PureComponent, createPortal, Children       |
+| Debug       | `preact/debug`       | Development warnings and component stack traces                                                    |
+| DevTools    | `preact/devtools`    | Preact DevTools browser extension support                                                          |
+| JSX Runtime | `preact/jsx-runtime` | Automatic JSX transform (Babel/esbuild)                                                            |
+| Test Utils  | `preact/test-utils`  | act() and setupRerender() for testing                                                              |
 
 ## Installation
 
-### Option 1: Copy and Paste (Recommended for secure environments)
+### Option 1: Copy and Paste
 
-Copy the `src/` directory into your project. No npm, no node_modules, no build step required.
+Copy these directories into your project:
 
 ```
 your-project/
-├── lib/
-│   └── worse-preact/    # Copy src/ contents here
-│       ├── index.js
-│       ├── vnode.js
-│       ├── render.js
-│       ├── diff.js
-│       ├── children.js
-│       ├── props.js
-│       ├── hooks.js
-│       ├── scheduler.js
-│       └── options.js
+├── lib/preact/
+│   ├── src/              # Core
+│   ├── hooks/src/        # Hooks
+│   ├── compat/src/       # Compat (optional)
+│   ├── debug/src/        # Debug (optional)
+│   ├── devtools/src/     # DevTools (optional)
+│   ├── jsx-runtime/src/  # JSX Runtime (optional)
+│   └── test-utils/src/   # Test Utils (optional)
 ├── app.js
 └── index.html
 ```
 
-### Option 2: npm (For development with tooling)
+### Option 2: Clone this repo
 
 ```bash
-npm install
+git clone <repo-url>
+npm install  # only needed for running tests
 ```
 
 ## Usage
 
-### No Build Step Required
-
-Works directly in any browser with ES6 module support:
+### With htm (no build step)
 
 ```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <script type="module">
-      import { h, render, useState } from './lib/worse-preact/index.js';
+<script type="module">
+  import { h, render } from './lib/preact/src/index.js';
+  import { useState } from './lib/preact/hooks/src/index.js';
+  import htm from 'https://esm.sh/htm';
 
-      function Counter() {
-        const [count, setCount] = useState(0);
-        return h('div', null, h('p', null, 'Count: ', count), h('button', { onClick: () => setCount((c) => c + 1) }, '+1'));
-      }
+  const html = htm.bind(h);
 
-      render(h(Counter), document.getElementById('app'));
-    </script>
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html>
+  function Counter() {
+    const [count, setCount] = useState(0);
+    return html`
+      <div>
+        <p>Count: ${count}</p>
+        <button onClick=${() => setCount((c) => c + 1)}>+1</button>
+      </div>
+    `;
+  }
+
+  render(html`<${Counter} />`, document.getElementById('app'));
+</script>
 ```
 
-No transpilation. No bundling. No node_modules. Just works.
+### With JSX + Vite
 
-### With htm (JSX-like syntax, no build step)
+```js
+// vite.config.js
+import { defineConfig } from 'vite';
 
-[htm](https://github.com/developit/htm) gives you JSX-like syntax using tagged template literals:
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <script type="module">
-      import { h, render, useState } from './lib/worse-preact/index.js';
-      import htm from 'https://esm.sh/htm';
-
-      const html = htm.bind(h);
-
-      function Counter() {
-        const [count, setCount] = useState(0);
-        return html`
-          <div>
-            <p>Count: ${count}</p>
-            <button onClick=${() => setCount((c) => c + 1)}>+1</button>
-          </div>
-        `;
-      }
-
-      render(html`<${Counter} />`, document.getElementById('app'));
-    </script>
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html>
+export default defineConfig({
+  esbuild: {
+    jsxFactory: 'h',
+    jsxFragment: 'Fragment',
+    jsxInject: "import { h, Fragment } from 'preact'",
+  },
+});
 ```
-
-For fully offline usage, download htm (~1KB) and include it locally.
-
-### With JSX (requires a build step)
 
 ```jsx
-import { h, render, useState } from 'worse-preact';
+import { render } from 'preact';
+import { useState } from 'preact/hooks';
 
 function Counter() {
   const [count, setCount] = useState(0);
-
   return (
     <div>
       <p>Count: {count}</p>
@@ -139,186 +112,16 @@ function Counter() {
 render(<Counter />, document.getElementById('app'));
 ```
 
-### With Vite
-
-Configure `vite.config.js`:
+### DevTools
 
 ```js
-import { defineConfig } from 'vite';
-
-export default defineConfig({
-  esbuild: {
-    jsxFactory: 'h',
-    jsxFragment: 'Fragment',
-    jsxInject: `import { h, Fragment } from './src/index.js'`,
-  },
-});
+import 'preact/devtools';
 ```
 
-### Aliasing React or Preact Imports
-
-You can alias `react`, `react-dom`, or `preact` to use this library instead, allowing you to use existing React/Preact code or libraries.
-
-**Vite:**
+### Debug Mode
 
 ```js
-// vite.config.js
-import { defineConfig } from 'vite';
-import path from 'path';
-
-export default defineConfig({
-  resolve: {
-    alias: {
-      react: path.resolve(__dirname, './src/index.js'),
-      'react-dom': path.resolve(__dirname, './src/index.js'),
-      preact: path.resolve(__dirname, './src/index.js'),
-      'preact/hooks': path.resolve(__dirname, './src/hooks.js'),
-    },
-  },
-  // ...
-});
-```
-
-**Webpack:**
-
-```js
-// webpack.config.js
-module.exports = {
-  resolve: {
-    alias: {
-      react: path.resolve(__dirname, './src/index.js'),
-      'react-dom': path.resolve(__dirname, './src/index.js'),
-      preact: path.resolve(__dirname, './src/index.js'),
-      'preact/hooks': path.resolve(__dirname, './src/hooks.js'),
-    },
-  },
-};
-```
-
-**esbuild:**
-
-```js
-esbuild.build({
-  alias: {
-    react: './src/index.js',
-    'react-dom': './src/index.js',
-  },
-});
-```
-
-This allows code like `import { useState } from 'react'` to work seamlessly.
-
-### DevTools Support
-
-Import the devtools module to enable Preact DevTools:
-
-```js
-import 'worse-preact/src/devtools.js';
-```
-
-### HMR / Fast Refresh
-
-Use the included Vite plugin for Hot Module Replacement with state preservation:
-
-```js
-// vite.config.js
-import { defineConfig } from 'vite';
-import worsePreactHmr from 'worse-preact/vite-plugin';
-
-export default defineConfig({
-  plugins: [worsePreactHmr()],
-  esbuild: {
-    jsxFactory: 'h',
-    jsxFragment: 'Fragment',
-    jsxInject: `import { h, Fragment } from 'worse-preact'`,
-  },
-});
-```
-
-The plugin uses Babel to detect components and track hook signatures. When you edit a component:
-
-- **Code/JSX changes only**: State is preserved
-- **Hook changes** (add/remove/reorder): State is automatically reset
-
-> **Note:** The official `@preact/preset-vite` does not work with this library. Use the included Vite plugin instead.
-
-## API Reference
-
-### Core
-
-| Export                        | Description                              |
-| ----------------------------- | ---------------------------------------- |
-| `h(type, props, ...children)` | Create a virtual DOM element             |
-| `createElement`               | Alias for `h`                            |
-| `render(vnode, container)`    | Render a vnode tree to the DOM           |
-| `hydrate(vnode, container)`   | Hydrate server-rendered HTML             |
-| `Fragment`                    | Group children without a wrapper element |
-| `createRef()`                 | Create a ref object `{ current: null }`  |
-
-### Hooks
-
-| Hook                              | Description                              |
-| --------------------------------- | ---------------------------------------- |
-| `useState(initial)`               | State that triggers re-renders           |
-| `useReducer(reducer, initial)`    | State with reducer pattern               |
-| `useEffect(callback, deps)`       | Side effects after paint                 |
-| `useLayoutEffect(callback, deps)` | Side effects before paint                |
-| `useRef(initial)`                 | Mutable ref that persists across renders |
-| `useMemo(factory, deps)`          | Memoized computed value                  |
-| `useCallback(callback, deps)`     | Memoized callback function               |
-| `useContext(context)`             | Read from a context                      |
-| `useSyncExternalStore(sub, snap)` | Subscribe to an external store           |
-| `useDebugValue(value)`            | No-op (API compatibility)                |
-
-## Project Structure
-
-```
-src/
-  index.js         # Public API exports
-  vnode.js         # h(), createElement, Fragment, createRef
-  render.js        # render() entry point
-  diff.js          # Core diffing algorithm
-  children.js      # Child reconciliation with key support
-  props.js         # DOM property handling, event delegation
-  hooks.js         # All React-style hooks
-  scheduler.js     # Batched re-render scheduling
-  options.js       # Hook points for plugins
-  devtools.js      # Preact DevTools integration
-  hmr-runtime.js   # Hot Module Replacement runtime
-  hmr-constants.js # HMR internal constants
-
-vite-plugin-hmr.js # Vite plugin for HMR/Fast Refresh
-
-demo-jsx/          # JSX demo (standalone package)
-  package.json     # Has worse-preact as dependency
-  vite.config.js   # Uses worse-preact/vite-plugin
-  main.jsx         # Demo entry point
-  components/      # Example components
-
-demo-htm/          # HTM demo (standalone package)
-  package.json     # Has worse-preact + htm as dependencies
-  vite.config.js   # Uses worse-preact/vite-plugin
-  main.js          # Demo entry point
-  components/      # Example components
-
-tests/
-  *.test.js        # Jest test suite
-```
-
-## Running the Demos
-
-Each demo is a standalone package that shows how to use worse-preact:
-
-```bash
-# JSX Demo
-cd demo-jsx
-npm install
-npm run dev
-
-# HTM Demo
-cd demo-htm
-npm install
-npm run dev
+import 'preact/debug'; // adds development warnings
 ```
 
 ## Running Tests
@@ -327,79 +130,30 @@ npm run dev
 npm test
 ```
 
-## Architecture
+## Project Structure
 
-### VNode Structure
-
-```js
-{
-  type,        // 'div', MyComponent, or Fragment
-  props,       // { className, onClick, children, ... }
-  key,         // For list reconciliation
-  ref,         // { current } or callback
-  _children,   // Processed child vnodes
-  _dom,        // Actual DOM element
-  _component,  // Component instance (for hooks)
-  _parent,     // Parent vnode
-  _depth,      // Tree depth
-  _flags,      // Reconciliation state
-}
+```
+src/                      # Core (h, render, Component, Fragment, etc.)
+  diff/                   # Reconciliation algorithm
+hooks/src/                # Hooks (useState, useEffect, etc.)
+compat/src/               # React compatibility layer
+debug/src/                # Development warnings
+devtools/src/             # DevTools integration
+jsx-runtime/src/          # Automatic JSX transform
+test-utils/src/           # Testing utilities
+tests/                    # Jest test suite
+demo-jsx/                 # JSX demo app (Vite)
+demo-htm/                 # htm demo app (Vite)
 ```
 
-### Diffing Algorithm
+## What Changed from Stock Preact
 
-1. **Component** (`typeof type === 'function'`): Call function, diff result
-2. **Element** (`typeof type === 'string'`): Create/update DOM, diff children
-3. **Text** (`type === null`): Create/update text node
+1. **Added `.js` extensions** to all relative imports for native ESM
+2. **Removed build system** (microbundle, babel, property mangling)
+3. **Removed `.d.ts` type definitions**
+4. **Package.json exports** point directly to source files
 
-### Child Reconciliation
-
-Two-phase algorithm:
-
-1. **Match phase**: Find matching old children by `(key, type)`
-2. **Diff phase**: Recursively diff matched pairs, handle insertions/removals
-
-### Event Delegation
-
-Events use delegation with a single proxy per event type:
-
-```js
-dom._listeners[eventName] = handler;
-dom.addEventListener(eventName, eventProxy);
-```
-
-### Hook State
-
-Hooks store state on the component instance:
-
-```js
-component.__hooks = {
-  _list: [], // Hook states by call order
-  _pendingEffects: [], // Effects queued for after paint
-};
-```
-
-## Compatibility
-
-This library implements the core APIs needed for most applications:
-
-| Feature                               | Status                                 |
-| ------------------------------------- | -------------------------------------- |
-| Function components                   | Supported                              |
-| All hooks (useState, useEffect, etc.) | Supported                              |
-| Fragments                             | Supported                              |
-| Refs (object and callback)            | Supported                              |
-| Keys                                  | Supported                              |
-| SVG                                   | Supported                              |
-| `Component` class                     | Not included (use function components) |
-| `createContext`                       | Supported                              |
-| `forwardRef`                          | Not included                           |
-| `memo`                                | Not included                           |
-| `lazy` / `Suspense`                   | Not included                           |
-| `cloneElement`                        | Not included                           |
-| `createPortal`                        | Supported                              |
-
-For most applications using modern function components and hooks, this library is a drop-in replacement. Code prioritizes readability over bundle size.
+The JavaScript source is otherwise unmodified.
 
 ## License
 

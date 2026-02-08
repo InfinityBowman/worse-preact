@@ -5,7 +5,8 @@
  * Shows how context eliminates prop drilling
  */
 
-import { useState, useContext, createContext, useMemo, useCallback } from 'worse-preact';
+import { useState, useContext, useMemo, useCallback } from 'preact/hooks';
+import { createContext } from 'preact';
 
 // Create a theme context with default value
 const ThemeContext = createContext({

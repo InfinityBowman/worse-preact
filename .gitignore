@@ -23,12 +23,7 @@ npm-debug.log*
 coverage/
 
 # Reference repos (cloned for development)
-tmp/
-reference/
-preact-source/
-preact-test-demo/
-preact-devtools-ref/
-preact-reference/
+_reference/
 
 # Environment
 .env

@@ -4,7 +4,7 @@
  * Demonstrates: useEffect with event listeners
  */
 
-import { useState, useEffect, useRef } from 'worse-preact';
+import { useState, useEffect, useRef } from 'preact/hooks';
 import { html } from '../html.js';
 
 export function MouseTracker() {

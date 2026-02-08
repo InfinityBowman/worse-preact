@@ -4,7 +4,7 @@
  * Demonstrates: useState hook
  */
 
-import { useState } from 'worse-preact';
+import { useState } from 'preact/hooks';
 
 export function Counter() {
   const [count, setCount] = useState(0);

@@ -1,18 +1,16 @@
-/**
- * Options - Hook points for plugins like DevTools and HMR
- *
- * This allows external code to hook into the rendering lifecycle
- * without modifying the core library.
- *
- * Hook naming follows Preact conventions:
- * - Public hooks use full names (vnode, diffed, unmount)
- * - Internal hooks use underscore prefix (_diff, _render, _commit)
- *
- * IMPORTANT: This object starts mostly empty. Plugins like DevTools
- * will add their own hooks by setting properties on this object.
- */
+import { _catchError } from './diff/catch-error.js';
 
 /**
+ * The `option` object can potentially contain callback functions
+ * that are called during various stages of our renderer. This is the
+ * foundation on which all our addons like `preact/debug`, `preact/compat`,
+ * and `preact/hooks` are based on. See the `Options` type in `internal.d.ts`
+ * for a full list of available option hooks (most editors/IDEs allow you to
+ * ctrl+click or cmd+click on mac the type definition below).
  * @type {import('./internal').Options}
  */
-export const options = {};
+const options = {
+	_catchError
+};
+
+export default options;

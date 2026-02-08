@@ -4,7 +4,8 @@
  * Demonstrates: createPortal for rendering modals outside the component tree
  */
 
-import { useState, useEffect, createPortal } from 'worse-preact';
+import { useState, useEffect } from 'preact/hooks';
+import { createPortal } from 'preact/compat';
 
 // Modal component that renders into a portal
 function Modal({ isOpen, onClose, title, children }) {

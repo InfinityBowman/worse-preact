@@ -4,7 +4,7 @@
  * Demonstrates: Prop drilling, component composition, dynamic styling
  */
 
-import { useState, useMemo, useCallback } from 'worse-preact';
+import { useState, useMemo, useCallback } from 'preact/hooks';
 import { html } from '../html.js';
 
 // Theme presets

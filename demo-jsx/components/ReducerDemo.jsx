@@ -4,7 +4,7 @@
  * Demonstrates: useReducer for complex state logic
  */
 
-import { useReducer } from 'worse-preact';
+import { useReducer } from 'preact/hooks';
 
 const initialState = {
   count: 0,

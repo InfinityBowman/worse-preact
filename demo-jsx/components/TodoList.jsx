@@ -4,7 +4,7 @@
  * Demonstrates: Keyed lists, useRef, event handling
  */
 
-import { useState, useRef } from 'worse-preact';
+import { useState, useRef } from 'preact/hooks';
 
 export function TodoList() {
   const [todos, setTodos] = useState([

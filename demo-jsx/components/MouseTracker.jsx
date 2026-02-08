@@ -4,7 +4,7 @@
  * Demonstrates: useCallback, useRef, event handling, dynamic styles
  */
 
-import { useState, useCallback, useRef } from 'worse-preact';
+import { useState, useCallback, useRef } from 'preact/hooks';
 
 export function MouseTracker() {
   const [position, setPosition] = useState({ x: 0, y: 0 });

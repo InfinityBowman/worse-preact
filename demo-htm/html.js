@@ -5,7 +5,7 @@
  * Import this in components to use HTM syntax.
  */
 
-import { h } from 'worse-preact';
+import { h } from 'preact';
 import htm from 'htm';
 
 // Bind HTM to our h function

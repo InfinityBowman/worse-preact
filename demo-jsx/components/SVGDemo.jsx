@@ -4,7 +4,7 @@
  * Demonstrates: SVG namespace handling, animations with useEffect
  */
 
-import { useState, useEffect } from 'worse-preact';
+import { useState, useEffect } from 'preact/hooks';
 
 export function SVGDemo() {
   const [rotation, setRotation] = useState(0);

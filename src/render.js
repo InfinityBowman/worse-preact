@@ -1,104 +1,70 @@
-/**
- * Render Entry Point
- *
- * This module provides the main render() function that users call
- * to mount their application into a DOM container.
- */
-
-import { diff, commitRoot } from './diff.js';
-import { diffChildren } from './children.js';
-import { unmount } from './diff.js';
-import { options } from './options.js';
-import { Fragment, createVNode } from './vnode.js';
+import { EMPTY_OBJ, MODE_HYDRATE, NULL } from './constants.js';
+import { commitRoot, diff } from './diff/index.js';
+import { createElement, Fragment } from './create-element.js';
+import options from './options.js';
+import { slice } from './util.js';
 
 /**
- * SVG namespace URI
+ * Render a Preact virtual node into a DOM element
+ * @param {import('./internal').ComponentChild} vnode The virtual node to render
+ * @param {import('./internal').PreactElement} parentDom The DOM element to render into
  */
-const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+export function render(vnode, parentDom) {
+	// https://github.com/preactjs/preact/issues/3794
+	if (parentDom == document) {
+		parentDom = document.documentElement;
+	}
 
-/**
- * Renders a virtual DOM tree into a container element
- *
- * @param {Object} vnode - Virtual DOM tree to render
- * @param {Element} container - DOM element to render into
- *
- * @example
- * // Mount an app
- * render(h(App), document.getElementById('root'));
- *
- * @example
- * // Update - just call render again
- * render(h(App, { page: 'about' }), document.getElementById('root'));
- *
- * @example
- * // Unmount
- * render(null, document.getElementById('root'));
- */
-export function render(vnode, container) {
-  // Get the old root vnode from the container
-  const oldVNode = container._children;
+	if (options._root) options._root(vnode, parentDom);
 
-  // Create a new root vnode wrapped in Fragment (like Preact does)
-  // DevTools expects the root vnode to have type === Fragment
-  const newVNode = createVNode(
-    Fragment,
-    { children: vnode },
-    null,
-    null
-  );
+	// @ts-expect-error
+	let isHydrating = vnode && vnode._flags & MODE_HYDRATE;
 
-  // Set _dom to container so scheduler can find parent DOM for re-renders
-  newVNode._dom = container;
+	// To be able to support calling `render()` multiple times on the same
+	// DOM node, we need to obtain a reference to the previous tree. We do
+	// this by assigning a new `_children` property to DOM nodes which points
+	// to the last rendered tree. By default this property is not present, which
+	// means that we are mounting a new tree for the first time.
+	let oldVNode = isHydrating ? NULL : parentDom._children;
 
-  // Store on container for next render
-  container._children = newVNode;
+	parentDom._children = createElement(Fragment, NULL, [vnode]);
 
-  // Queues for post-diff processing
-  const commitQueue = []; // Components with pending effects
-  const refQueue = []; // Refs to apply
+	// List of effects that need to be called after diffing.
+	let commitQueue = [],
+		refQueue = [];
 
-  // Detect SVG namespace from container
-  // This handles the case where we're rendering inside an existing SVG
-  const namespace =
-    container.namespaceURI === SVG_NAMESPACE ? SVG_NAMESPACE : null;
+	diff(
+		parentDom,
+		// Determine the new vnode tree and store it on the DOM element on
+		// our custom `_children` property.
+		parentDom._children,
+		oldVNode || EMPTY_OBJ,
+		EMPTY_OBJ,
+		parentDom.namespaceURI,
+		oldVNode
+			? NULL
+			: parentDom.firstChild
+				? slice.call(parentDom.childNodes)
+				: NULL,
+		commitQueue,
+		oldVNode ? oldVNode._dom : parentDom.firstChild,
+		// @ts-expect-error we are doing a bit-wise operation so it's either 0 or true
+		isHydrating,
+		refQueue,
+		parentDom.ownerDocument
+	);
 
-  // Call _root hook (notifies DevTools of render target)
-  if (options._root) {
-    options._root(newVNode, container);
-  }
-
-  // Diff the new root against the old root
-  diff(
-    container,
-    newVNode,
-    oldVNode || {},
-    namespace,
-    commitQueue,
-    container.firstChild,
-    refQueue
-  );
-
-  // Apply refs and schedule effects
-  commitRoot(commitQueue, newVNode, refQueue);
-
-  // Call _commit hook (notifies DevTools that render is complete)
-  if (options._commit) {
-    options._commit(newVNode, commitQueue);
-  }
+	// Flush all queued effects
+	commitRoot(commitQueue, parentDom._children, refQueue);
 }
 
 /**
- * Hydrates a server-rendered DOM tree
- *
- * Similar to render(), but attempts to reuse existing DOM nodes
- * instead of creating new ones. Used for server-side rendering.
- *
- * @param {Object} vnode - Virtual DOM tree to hydrate
- * @param {Element} container - DOM element with server-rendered content
+ * Update an existing DOM element with data from a Preact virtual node
+ * @param {import('./internal').ComponentChild} vnode The virtual node to render
+ * @param {import('./internal').PreactElement} parentDom The DOM element to update
  */
-export function hydrate(vnode, container) {
-  // For now, hydrate is the same as render
-  // A full implementation would walk the existing DOM and attach vnodes
-  // without recreating elements
-  render(vnode, container);
+export function hydrate(vnode, parentDom) {
+	// @ts-expect-error
+	vnode._flags |= MODE_HYDRATE;
+	render(vnode, parentDom);
 }

@@ -4,7 +4,7 @@
  * Demonstrates: Controlled inputs, form handling
  */
 
-import { useState, useRef, useLayoutEffect } from 'worse-preact';
+import { useState, useRef, useLayoutEffect } from 'preact/hooks';
 
 export function FormDemo() {
   const [formData, setFormData] = useState({

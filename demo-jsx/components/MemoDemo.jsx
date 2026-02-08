@@ -4,7 +4,7 @@
  * Demonstrates: useMemo for expensive computations
  */
 
-import { useState, useMemo } from 'worse-preact';
+import { useState, useMemo } from 'preact/hooks';
 
 // Simulated expensive computation
 function expensiveCalculation(n) {

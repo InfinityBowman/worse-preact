@@ -4,7 +4,7 @@
  * Demonstrates: useReducer for complex state
  */
 
-import { useReducer } from 'worse-preact';
+import { useReducer } from 'preact/hooks';
 import { html } from '../html.js';
 
 const initialState = { count: 0, history: [] };

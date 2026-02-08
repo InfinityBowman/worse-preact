@@ -1,21 +1,27 @@
 {
-  "name": "worse-preact",
-  "version": "1.0.0",
-  "description": "A minimal, readable Preact-compatible virtual DOM library",
-  "author": "Jacob Maynard",
-  "main": "src/index.js",
+  "name": "preact",
+  "version": "11.0.0",
+  "description": "Preact source for easy copy-paste usage, no complex build required",
   "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
   "exports": {
     ".": "./src/index.js",
-    "./hooks": "./src/hooks.js",
-    "./devtools": "./src/devtools.js",
-    "./hmr": "./src/hmr-runtime.js",
-    "./vite-plugin": "./vite-plugin-hmr.js"
+    "./compat": "./compat/src/index.js",
+    "./compat/client": "./compat/client.js",
+    "./compat/scheduler": "./compat/scheduler.js",
+    "./compat/jsx-runtime": "./compat/jsx-runtime.js",
+    "./compat/jsx-dev-runtime": "./compat/jsx-dev-runtime.js",
+    "./compat/test-utils": "./test-utils/src/index.js",
+    "./debug": "./debug/src/index.js",
+    "./devtools": "./devtools/src/index.js",
+    "./hooks": "./hooks/src/index.js",
+    "./jsx-runtime": "./jsx-runtime/src/index.js",
+    "./jsx-dev-runtime": "./jsx-runtime/src/index.js",
+    "./test-utils": "./test-utils/src/index.js"
   },
   "scripts": {
-    "build": "vite build",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --no-watchman",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --no-watchman"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --no-watchman"
   },
   "keywords": [
     "preact",
@@ -24,22 +30,9 @@
     "react"
   ],
   "license": "MIT",
-  "dependencies": {
-    "@babel/core": "^7.26.0",
-    "@prefresh/babel-plugin": "^0.5.2"
-  },
-  "peerDependencies": {
-    "vite": ">=5.0.0"
-  },
-  "peerDependenciesMeta": {
-    "vite": {
-      "optional": true
-    }
-  },
   "devDependencies": {
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "vite": "^7.3.1"
+    "jest-environment-jsdom": "^29.7.0"
   },
   "jest": {
     "testEnvironment": "jsdom",

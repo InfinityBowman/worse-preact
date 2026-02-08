@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "worse-preact": "file:.."
+    "preact": "file:.."
   },
   "devDependencies": {
     "vite": "^7.3.1"

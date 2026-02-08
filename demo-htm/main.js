@@ -6,9 +6,9 @@
  */
 
 // Import DevTools integration (connects to Preact DevTools extension)
-import 'worse-preact/devtools';
+import 'preact/devtools';
 
-import { render } from 'worse-preact';
+import { render } from 'preact';
 import { html } from './html.js';
 
 // Import all demo components

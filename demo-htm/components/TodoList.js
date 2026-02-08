@@ -4,7 +4,7 @@
  * Demonstrates: Array state management, useRef
  */
 
-import { useState, useRef } from 'worse-preact';
+import { useState, useRef } from 'preact/hooks';
 import { html } from '../html.js';
 
 export function TodoList() {
