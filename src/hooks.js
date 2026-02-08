@@ -258,6 +258,11 @@ export function useCallback(callback, deps) {
 /**
  * useSyncExternalStore - Subscribes to an external store
  *
+ * Based on React's shim implementation. Uses a mutable instance object
+ * stored in useState to avoid stale closure issues, and a double-check
+ * pattern (useLayoutEffect + useEffect) to catch mutations between
+ * render and subscription.
+ *
  * @param {Function} subscribe - Function (callback) => unsubscribe
  * @param {Function} getSnapshot - Returns the current store value
  * @param {Function} [getServerSnapshot] - Unused (SSR), accepted for API compat
@@ -267,22 +272,62 @@ export function useCallback(callback, deps) {
  * const state = useSyncExternalStore(store.subscribe, store.getState);
  */
 export function useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
-  const [snapshot, setSnapshot] = useState(() => getSnapshot());
+  // Read current snapshot on every render
+  const value = getSnapshot();
 
-  // Re-subscribe whenever subscribe identity changes
+  // Store snapshot and getSnapshot in a mutable instance object.
+  // This avoids stale closures in the subscription callback -
+  // the callback closes over the instance, but reads its current properties.
+  const [{ _inst }, forceUpdate] = useState({
+    _inst: { _value: value, _getSnapshot: getSnapshot }
+  });
+
+  // Update the instance in the layout phase (synchronously, before
+  // passive effects) so that the subscription callback always sees
+  // the latest values.
+  useLayoutEffect(() => {
+    _inst._value = value;
+    _inst._getSnapshot = getSnapshot;
+
+    // Check if store was mutated between render and commit
+    if (didSnapshotChange(_inst)) {
+      forceUpdate({ _inst });
+    }
+  }, [subscribe, value, getSnapshot]);
+
   useEffect(() => {
-    // Check for a missed update between render and subscribe
-    const currentSnapshot = getSnapshot();
-    if (!Object.is(snapshot, currentSnapshot)) {
-      setSnapshot(() => currentSnapshot);
+    // Check for changes right before subscribing
+    if (didSnapshotChange(_inst)) {
+      forceUpdate({ _inst });
     }
 
     return subscribe(() => {
-      setSnapshot(() => getSnapshot());
+      if (didSnapshotChange(_inst)) {
+        forceUpdate({ _inst });
+      }
     });
   }, [subscribe]);
 
-  return snapshot;
+  return value;
+}
+
+/**
+ * Checks if the external store snapshot has changed since last read.
+ * Catches errors from getSnapshot and treats them as a change,
+ * allowing error boundaries to handle the error on re-render.
+ *
+ * @param {{ _value: *, _getSnapshot: Function }} inst - Store instance
+ * @returns {boolean} True if snapshot changed
+ */
+function didSnapshotChange(inst) {
+  const latestGetSnapshot = inst._getSnapshot;
+  const prevValue = inst._value;
+  try {
+    const nextValue = latestGetSnapshot();
+    return !Object.is(prevValue, nextValue);
+  } catch (error) {
+    return true;
+  }
 }
 
 /**
