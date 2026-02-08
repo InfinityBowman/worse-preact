@@ -10,11 +10,7 @@
  */
 
 import { enqueueRender } from './scheduler.js';
-import {
-  findProvider,
-  subscribeToProvider,
-  cleanupContextSubscriptions,
-} from './context.js';
+import { findProvider, subscribeToProvider, cleanupContextSubscriptions } from './context.js';
 
 /**
  * The component currently being rendered
@@ -76,8 +72,7 @@ export function useState(initialState) {
   if (!hookState._initialized) {
     hookState._initialized = true;
     // Support lazy initialization: useState(() => expensiveComputation())
-    hookState._value =
-      typeof initialState === 'function' ? initialState() : initialState;
+    hookState._value = typeof initialState === 'function' ? initialState() : initialState;
     // Store reference to component for setState
     hookState._component = currentComponent;
   }
@@ -86,8 +81,7 @@ export function useState(initialState) {
   if (!hookState._setState) {
     hookState._setState = (update) => {
       // Calculate next value
-      const nextValue =
-        typeof update === 'function' ? update(hookState._value) : update;
+      const nextValue = typeof update === 'function' ? update(hookState._value) : update;
 
       // Only re-render if value actually changed
       if (!Object.is(hookState._value, nextValue)) {
@@ -196,8 +190,7 @@ export function useLayoutEffect(callback, deps) {
     hookState._pendingArgs = deps;
 
     // Queue for synchronous execution (handled in commitRoot)
-    currentComponent.__hooks._pendingLayoutEffects =
-      currentComponent.__hooks._pendingLayoutEffects || [];
+    currentComponent.__hooks._pendingLayoutEffects = currentComponent.__hooks._pendingLayoutEffects || [];
     currentComponent.__hooks._pendingLayoutEffects.push(hookState);
   }
 }
@@ -281,11 +274,11 @@ export function useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) 
     // Check for a missed update between render and subscribe
     const currentSnapshot = getSnapshot();
     if (!Object.is(snapshot, currentSnapshot)) {
-      setSnapshot(currentSnapshot);
+      setSnapshot(() => currentSnapshot);
     }
 
     return subscribe(() => {
-      setSnapshot(getSnapshot());
+      setSnapshot(() => getSnapshot());
     });
   }, [subscribe]);
 
